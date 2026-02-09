@@ -1,24 +1,24 @@
-# Windows Device & CVE Reporter
+# CVE Checker
 
-Bu proje, Windows üzerinde yüklü cihazları ve sürücüleri listeleyen, 
-NVD API üzerinden son 3 ayda yayınlanan CVE kayıtlarını indiren ve 
-raporlayan bir Python uygulamasıdır.
+Windows cihazlarını ve sürücüleri listeleyen, NVD’den son 3 ayın CVE verilerini çeken ve güvenlik raporları oluşturan Python aracı.
 
 ## Özellikler
-- Yüklü cihazları listeleme
-- CVE veritabanını güncelleme
+- Yüklü cihazları ve sürücüleri listeleme (versiyon bilgisi varsa gösterir)
+- NVD’den son 3 ayın CVE verilerini indirme
 - Otomatik tarama raporu oluşturma
 - Manuel CVE sorgusu yapma
-- Logları inceleme
-- Çıktıları CSV olarak masaüstüne kaydetme
+- Son indirilen CVE kayıtlarını log olarak inceleme
+- Çıktıları masaüstüne CSV olarak kaydetme
 
 ## Kurulum
 ```bash
-git clone https://github.com/kullaniciadi/cve-reporter.git
-cd cve-reporter
+git clone https://github.com/M5a1ih/cve_checker.git
+cd cve_checker
 pip install -r requirements.txt
 
-##Örnek Çıktı
+##Kullanım
+python cve_checker.py
+
 
 === Ana Menü ===
 1 - Yüklü cihazları listele
@@ -26,14 +26,3 @@ pip install -r requirements.txt
 3 - Manuel CVE sorgusu yap
 4 - Logları incele
 5 - Çıkış
-
-+----------------------------+-------------------+
-| Device                     | Version           |
-+----------------------------+-------------------+
-| Intel(R) Ethernet Controller | 12.18.9         |
-| NVIDIA GeForce GTX 1050    | 31.0.15.5222      |
-| Realtek Audio Device       | Versiyon bulunamadı |
-+----------------------------+-------------------+
-
-
-
