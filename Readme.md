@@ -17,3 +17,23 @@ raporlayan bir Python uygulamasıdır.
 git clone https://github.com/kullaniciadi/cve-reporter.git
 cd cve-reporter
 pip install -r requirements.txt
+
+##Örnek Çıktı
+
+=== Ana Menü ===
+1 - Yüklü cihazları listele
+2 - Otomatik tarama raporu oluştur
+3 - Manuel CVE sorgusu yap
+4 - Logları incele
+5 - Çıkış
+
++----------------------------+-------------------+
+| Device                     | Version           |
++----------------------------+-------------------+
+| Intel(R) Ethernet Controller | 12.18.9         |
+| NVIDIA GeForce GTX 1050    | 31.0.15.5222      |
+| Realtek Audio Device       | Versiyon bulunamadı |
++----------------------------+-------------------+
+
+
+
