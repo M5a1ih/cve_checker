@@ -1,16 +1,27 @@
-# cve_checker
-CVE_Checker (Last 3 Months)
+# CVE Checker
 
+A Python tool to list Windows devices and drivers, fetch CVE data from NVD (last 3 months), and generate security reports.
 
-## Usage
+## Features
+- List installed devices and drivers (with version info if available)
+- Fetch CVE data from NVD (last 3 months)
+- Generate automatic scan reports
+- Perform manual CVE queries
+- Review logs (recent CVEs)
+- Export results to CSV files on Desktop
 
-After installing the dependencies, run the application from the command line:
-
+## Installation
 ```bash
+git clone https://github.com/M5a1ih/cve_checker.git
+cd cve_checker
+pip install -r requirements.txt
+
+
+
+##Usage
 python cve_checker.py
 
 
-Example Output
 === Main Menu ===
 1 - List installed devices
 2 - Generate automatic scan report
@@ -18,49 +29,13 @@ Example Output
 4 - Review logs
 5 - Exit
 
+Example Output
+
 +----------------------------+-------------------+
 | Device                     | Version           |
 +----------------------------+-------------------+
 | Intel(R) Ethernet Controller | 12.18.9         |
 | NVIDIA GeForce GTX 1050    | 31.0.15.5222      |
-| Realtek Audio Device       | Version not found |
+| Realtek Audio Device       | Versiyon bulunamadı |
 +----------------------------+-------------------+
-
----
-
-## Commit Message Style
-Keep commit messages simple and developer‑like:
-- `feat: add device listing menu`
-- `fix: correct CSV encoding to utf-8-sig`
-- `docs: update README with usage instructions`
-- `chore: add requirements.txt`
-
----
-
-## Repository Description
-On GitHub, you can describe the repo as:
-> A Python tool to list Windows devices, fetch CVEs from NVD, and generate security reports.
-
----
-
-
-# Windows Device & CVE Reporter
-
-This project is a Python application that collects installed devices and drivers on Windows, 
-fetches CVE data from the NVD API (last 3 months), and generates security reports.
-
-## Features
-- List installed devices and drivers
-- Update CVE database from NVD
-- Generate automatic scan reports
-- Perform manual CVE queries
-- Review logs (recent CVEs)
-- Export results to CSV files on the Desktop
-
-## Installation
-```bash
-git clone https://github.com/yourusername/cve-reporter.git
-cd cve-reporter
-pip install -r requirements.txt
-
 
