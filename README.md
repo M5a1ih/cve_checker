@@ -123,16 +123,24 @@ o	Ardından tarayıcıda http://127.0.0.1:5000 otomatik açılır.
 ________________________________________
 🔒 Güvenlik Notları
 •	API anahtarları hiçbir zaman koda gömülmemiştir.
+
 •	OPENAI_API_KEY yalnızca ortam değişkeninden okunur.
+
 •	NVD API key’i kullanmak isterseniz, NVD_API_KEY ortam değişkeni üzerinden tanımlanabilir.
+
 •	Bu repo’ya asla gerçek API key’lerinizi, .env dosyalarınızı veya log’larınızı commit etmeyin.
+
 •	Fix butonunun gerçek komut çalıştırma özelliği açıkça onay gerektirir.
+
 •	Varsayılan davranış yalnızca önerilen komutu simülasyon olarak göstermektir.
 ________________________________________
 🛠 Yol Haritası / Geliştirme Fikirleri
 •	Gerçek KEV feed entegrasyonu.
+
 •	NVD tarafında vendor / ürün bazlı daha akıllı filtreler.
+
 •	Uygulama sürümlerine göre daha hassas CPE eşleştirme.
+
 •	Kullanıcı profil ayarları (varsayılan CVSS eşiği, varsayılan filtreler, vb.).
 ________________________________________
 
