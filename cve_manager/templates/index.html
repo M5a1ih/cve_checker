@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CVE Vulnerability Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        table { border-collapse: collapse; width: 100%; table-layout: fixed; margin-bottom: 24px; }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            vertical-align: top;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            hyphens: auto;
+            font-size: 13px;
+        }
+        th { background-color: #333; color: white; }
+        td:nth-child(5), th:nth-child(5) { width: 250px; max-width: 250px; }
+        td:nth-child(2), th:nth-child(2) { width: 300px; max-width: 300px; }
+        button { padding: 4px 6px; cursor: pointer; }
+
+        /* Kritik ve KEV zengin CVE’leri öne çıkar */
+        .kev-row {
+            background-color: #fff3cd;
+        }
+        .critical-row {
+            background-color: #f8d7da;
+        }
+        .high-row {
+            background-color: #ffeeba;
+        }
+
+        .flash-success { color: green; margin-bottom: 10px; white-space: pre-wrap; }
+        .flash-error { color: red; margin-bottom: 10px; white-space: pre-wrap; }
+        .flash-info { color: #00529b; margin-bottom: 10px; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+<h2>CVE Dashboard</h2>
+{% if not ai_enabled %}
+  <div class="flash-info">
+    AI’dan öneri al butonları, bu makinede <code>OPENAI_API_KEY</code> tanımlandığında aktif olur.
+  </div>
+{% endif %}
+
+<!-- Flash mesajlar -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      {% set cls = 'flash-info' %}
+      {% if category == 'success' %}
+        {% set cls = 'flash-success' %}
+      {% elif category == 'error' %}
+        {% set cls = 'flash-error' %}
+      {% endif %}
+      <div class="{{ cls }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<form method="get" style="margin-bottom: 16px;">
+    <label for="mode"><strong>Gösterim Modu:</strong></label>
+    <select name="mode" id="mode" onchange="this.form.submit()">
+        <option value="recent" {% if mode=='recent' %}selected{% endif %}>Son 120 gün</option>
+        <option value="since2022" {% if mode=='since2022' %}selected{% endif %}>2022 sonrası</option>
+        <option value="db_all" {% if mode=='db_all' %}selected{% endif %}>Veritabanındaki tüm CVE’ler</option>
+    </select>
+
+    <label for="cvss"><strong>CVSS ≥</strong></label>
+    <input type="number" step="0.1" name="cvss" value="{{ cvss_threshold }}" onchange="this.form.submit()">
+
+    <label for="vendor"><strong>Arama:</strong></label>
+    <input
+        type="text"
+        id="vendor"
+        name="vendor"
+        value="{{ vendor or '' }}"
+        placeholder="örn. chrome, 144.0.7559.59, intel, CVE-2024-...">
+
+    <button type="submit">Filtrele</button>
+</form>
+
+<h3>Bu PC’deki yüklü programlar</h3>
+<p style="font-size: 13px; margin-top: 0;">
+    Toplam {{ installed_programs|length }} program bulundu.
+    <a href="{{ url_for('inventory_export') }}">CSV olarak indir</a>
+</p>
+<table cellpadding="5">
+    <tr>
+        <th>Program (Ad + Versiyon)</th>
+    </tr>
+    {% for p in installed_programs %}
+    <tr>
+        <td>{{ p }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h3>PC’nizdeki yazılımlarla eşleşen CVE’ler</h3>
+<table cellpadding="5">
+<tr>
+    <th>CVE</th>
+    <th>Description</th>
+    <th>Severity</th>
+    <th>CVSS</th>
+    <th>Affected Products</th>
+    <th>Suggested Fix</th>
+    <th>Published</th>
+    <th>Action</th>
+</tr>
+{% for r in matched_rows %}
+<tr class="
+    {% if r['kev_flag'] %}
+        kev-row
+    {% elif r['cvss_score'] and r['cvss_score'] >= 9 %}
+        critical-row
+    {% elif r['cvss_score'] and r['cvss_score'] >= 7 %}
+        high-row
+    {% endif %}
+">
+    <td><a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name={{ r['id'] }}" target="_blank">{{ r['id'] }}</a></td>
+    <td>{{ r['description'][:150] }}{% if r['description']|length > 150 %}...{% endif %}</td>
+    <td>{{ r['severity'] }}</td>
+    <td>{{ r['cvss_score'] }}</td>
+    <td>{{ r['cpe'] }}</td>
+    <td>{{ r['suggested_fix'] }}</td>
+    <td>{{ r['published'] }}</td>
+    <td>
+        <form method="post" style="margin-bottom: 4px;">
+            <button type="submit" name="fix_cve" value="{{ r['id'] }}">Fix</button>
+            <input type="hidden" name="suggested_fix" value="{{ r['suggested_fix'] }}">
+            <label style="font-size: 11px; display: block; margin-top: 4px;">
+                <input type="checkbox" name="execute_real" value="1">
+                Gerçek komutu çalıştır
+            </label>
+        </form>
+        {% if ai_enabled %}
+        <form method="post">
+            <input type="hidden" name="ai_cve" value="{{ r['id'] }}">
+            <input type="hidden" name="ai_desc" value="{{ r['description'] }}">
+            <input type="hidden" name="ai_cpe" value="{{ r['cpe'] }}">
+            <input type="hidden" name="ai_severity" value="{{ r['severity'] }}">
+            <input type="hidden" name="ai_cvss" value="{{ r['cvss_score'] }}">
+            <input type="hidden" name="ai_fix" value="{{ r['suggested_fix'] }}">
+            <button type="submit">AI’dan öneri al</button>
+        </form>
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}
+</table>
+
+<h3>Diğer CVE’ler (PC eşleşmeyen)</h3>
+<table cellpadding="5">
+<tr>
+    <th>CVE</th>
+    <th>Description</th>
+    <th>Severity</th>
+    <th>CVSS</th>
+    <th>Affected Products</th>
+    <th>Suggested Fix</th>
+    <th>Published</th>
+    <th>Action</th>
+</tr>
+{% for r in all_rows %}
+<tr class="
+    {% if r['kev_flag'] %}
+        kev-row
+    {% elif r['cvss_score'] and r['cvss_score'] >= 9 %}
+        critical-row
+    {% elif r['cvss_score'] and r['cvss_score'] >= 7 %}
+        high-row
+    {% endif %}
+">
+    <td><a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name={{ r['id'] }}" target="_blank">{{ r['id'] }}</a></td>
+    <td>{{ r['description'][:150] }}{% if r['description']|length > 150 %}...{% endif %}</td>
+    <td>{{ r['severity'] }}</td>
+    <td>{{ r['cvss_score'] }}</td>
+    <td>{{ r['cpe'] }}</td>
+    <td>{{ r['suggested_fix'] }}</td>
+    <td>{{ r['published'] }}</td>
+    <td>
+        {% if ai_enabled %}
+        <form method="post">
+            <input type="hidden" name="ai_cve" value="{{ r['id'] }}">
+            <input type="hidden" name="ai_desc" value="{{ r['description'] }}">
+            <input type="hidden" name="ai_cpe" value="{{ r['cpe'] }}">
+            <input type="hidden" name="ai_severity" value="{{ r['severity'] }}">
+            <input type="hidden" name="ai_cvss" value="{{ r['cvss_score'] }}">
+            <input type="hidden" name="ai_fix" value="{{ r['suggested_fix'] }}">
+            <button type="submit">AI’dan öneri al</button>
+        </form>
+        {% else %}
+        <span style="font-size: 11px; color: #666;">AI devre dışı (OPENAI_API_KEY yok)</span>
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}
+</table>
+
+</body>
+</html>
