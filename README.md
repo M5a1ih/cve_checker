@@ -1,4 +1,4 @@
-# CVE Vulnerability Manager
+# CVE Vulnerability Manager 
 
 Windows üzerinde yüklü uygulamaları tarayıp, NVD CVE veritabanıyla eşleştiren, KEV bilgisiyle zenginleştiren ve remediation (düzeltme) önerileri sunan mini dashboard.
 
